@@ -1,0 +1,439 @@
+<html>
+  <head>
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+    <style>
+      body {
+        font-family: 'Roboto';
+        font-size: 16px;
+      }
+
+      .large-text{
+        font-size: 56px;
+      }
+
+      .number-0 {
+        color: red;
+      }
+
+      .number-1 {
+        color: orange;
+      }
+
+      .number-2 {
+        color: green;
+      }
+
+      .number-3 {
+        color: blue;
+      }
+
+      .number-4 {
+        color: purple;
+      }
+    </style>
+  </head>
+  <body>
+    <p class="regular-text">
+      Instructions: hit the Show button to advance the answers.
+    </p>
+
+    <p class="regular-text">
+      First pick a range:
+      For example, for multiples of 10,000, select range 10000-99999.
+      To learn hundreds, select range 100-999.
+    </p>
+
+    <p class="regular-text">
+      Modes:
+      <ul>
+        <li>Random Number: learn how to break down a number into parts</li>
+        <li>Learn Numbers: learn the digits in order</li>
+        <li>Random Digit: practice random digits</li>
+        <li>Test: translate the whole random number</li>
+      </ul>
+    </p>
+
+
+    <label for="text" class="regular-text">Text:</label>
+
+    <select name="text" id="text">
+      <option value="3">Hiragana + Kanji</option>
+      <option value="0">Romaji</option>
+      <option value="1">Hiragana</option>
+      <option value="2">Kanji</option>
+    </select>
+
+
+    <label for="mode" class="regular-text">Mode:</label>
+
+    <select name="mode" id="mode">
+      <option value="3">Random Number</option>
+      <option value="0">Learn Numbers</option>
+      <option value="1">Random Digit</option>
+      <option value="2">Test</option>
+    </select>
+
+    <label for="max" class="regular-text">Range:</label>
+
+    <select name="max" id="max">
+      <option value="4">10000-99999</option>
+      <option value="3">1000-9999</option>
+      <option value="2">100-999</option>
+      <option value="1">10-99</option>
+      <option value="0">0-9</option>
+    </select>
+
+    <button id="show">Show</button>
+
+    <div id="number-prompt" class="large-text">
+      <span id="number-0" class="number-0">_</span>
+      <span id="number-1" class="number-1">_</span>
+      ,
+      <span id="number-2" class="number-2">_</span>
+      <span id="number-3" class="number-3">_</span>
+      <span id="number-4" class="number-4">_</span>
+    </div>
+    <div id="explanation" class="large-text">
+    </div>
+    <script>
+      const PRONUNCIATIONS = [
+        undefined,
+        {
+          'glyph': '1',
+          'pronunciations': [{
+            'romaji': 'ichi man',
+            'hiragana': 'いちまん',
+            'kanji': '一万'
+          }, {
+            'romaji': 'sen',
+            'hiragana': 'せん',
+            'kanji': '千'
+          }, {
+            'romaji': 'hyaku',
+            'hiragana': 'ひゃく',
+            'kanji': '百'
+          }, {
+            'romaji': 'jyuu',
+            'hiragana': 'じゅう',
+            'kanji': '十'
+          }, {
+            'romaji': 'ichi',
+            'hiragana': 'いち',
+            'kanji': '一'
+          }]
+        }, {
+          'glyph': '2',
+          'pronunciations': [{
+            'romaji': 'ni man',
+            'hiragana': 'にまん',
+            'kanji': '二万'
+          }, {
+            'romaji': 'ni sen',
+            'hiragana': 'にせん',
+            'kanji': '二千'
+          }, {
+            'romaji': 'ni hyaku',
+            'hiragana': 'にひゃく',
+            'kanji': '二百'
+          }, {
+            'romaji': 'ni jyuu',
+            'hiragana': 'にじゅう',
+            'kanji': '二十'
+          }, {
+            'romaji': 'ni',
+            'hiragana': 'に',
+            'kanji': '二'
+          }]
+        }, {
+          'glyph': '3',
+          'pronunciations': [{
+            'romaji': 'san man',
+            'hiragana': 'さんまん',
+            'kanji': '三万'
+          }, {
+            'romaji': 'san zen',
+            'hiragana': 'さんぜん',
+            'kanji': '三千'
+          }, {
+            'romaji': 'san byaku',
+            'hiragana': 'さんびゃく',
+            'kanji': '三百'
+          }, {
+            'romaji': 'san jyuu',
+            'hiragana': 'さんじゅう',
+            'kanji': '三十'
+          }, {
+            'romaji': 'san',
+            'hiragana': 'さん',
+            'kanji': '三'
+          }]
+        }, {
+          'glyph': '4',
+          'pronunciations': [{
+            'romaji': 'yon man',
+            'hiragana': 'よんまん',
+            'kanji': '四万'
+          }, {
+            'romaji': 'yon sen',
+            'hiragana': 'よんせん',
+            'kanji': '四千'
+          }, {
+            'romaji': 'yon hyaku',
+            'hiragana': 'よんひゃく',
+            'kanji': '四百'
+          }, {
+            'romaji': 'yon jyuu',
+            'hiragana': 'よんじゅう',
+            'kanji': '四十'
+          }, {
+            'romaji': 'yon',
+            'hiragana': 'よん',
+            'kanji': '四'
+          }]
+        }, {
+          'glyph': '5',
+          'pronunciations': [{
+            'romaji': 'go man',
+            'hiragana': 'ごまん',
+            'kanji': '五万'
+          }, {
+            'romaji': 'go sen',
+            'hiragana': 'ごせん',
+            'kanji': '五千'
+          }, {
+            'romaji': 'go hyaku',
+            'hiragana': 'ごひゃく',
+            'kanji': '五百'
+          }, {
+            'romaji': 'go jyuu',
+            'hiragana': 'ごじゅう',
+            'kanji': '五十'
+          }, {
+            'romaji': 'go',
+            'hiragana': 'ご',
+            'kanji': '五'
+          }]
+        }, {
+          'glyph': '6',
+          'pronunciations': [{
+            'romaji': 'roku man',
+            'hiragana': 'ろくまん',
+            'kanji': '六万'
+          }, {
+            'romaji': 'roku sen',
+            'hiragana': 'ろくせん',
+            'kanji': '六千'
+          }, {
+            'romaji': 'ro ppyaku',
+            'hiragana': 'ろっぴゃく',
+            'kanji': '六百'
+          }, {
+            'romaji': 'roku jyuu',
+            'hiragana': 'ろくじゅう',
+            'kanji': '六十'
+          }, {
+            'romaji': 'roku',
+            'hiragana': 'ろく',
+            'kanji': '六'
+          }]
+        }, {
+          'glyph': '7',
+          'pronunciations': [{
+            'romaji': 'nana man',
+            'hiragana': 'ななまん',
+            'kanji': '七万'
+          }, {
+            'romaji': 'nana sen',
+            'hiragana': 'ななせん',
+            'kanji': '七千'
+          }, {
+            'romaji': 'nana hyaku',
+            'hiragana': 'ななひゃく',
+            'kanji': '七百'
+          }, {
+            'romaji': 'nana jyuu',
+            'hiragana': 'ななじゅう',
+            'kanji': '七十'
+          }, {
+            'romaji': 'nana',
+            'hiragana': 'なな',
+            'kanji': '七'
+          }]
+        }, {
+          'glyph': '8',
+          'pronunciations': [{
+            'romaji': 'hachi man',
+            'hiragana': 'はちまん',
+            'kanji': '八万'
+          }, {
+            'romaji': 'ha ssen',
+            'hiragana': 'はっせん',
+            'kanji': '八千'
+          }, {
+            'romaji': 'ha ppyaku',
+            'hiragana': 'はっぴゃく',
+            'kanji': '八百'
+          }, {
+            'romaji': 'hachi jyuu',
+            'hiragana': 'はちじゅう',
+            'kanji': '八十'
+          }, {
+            'romaji': 'hachi',
+            'hiragana': 'はち',
+            'kanji': '八'
+          }]
+        }, {
+          'glyph': '9',
+          'pronunciations': [{
+            'romaji': 'kyuu man',
+            'hiragana': 'きゅうまん',
+            'kanji': '九万'
+          }, {
+            'romaji': 'kyuu sen',
+            'hiragana': 'きゅうせん',
+            'kanji': '九千'
+          }, {
+            'romaji': 'kyuu hyaku',
+            'hiragana': 'きゅうひゃく',
+            'kanji': '九百'
+          }, {
+            'romaji': 'kyuu jyuu',
+            'hiragana': 'きゅうじゅう',
+            'kanji': '九十'
+          }, {
+            'romaji': 'kyuu',
+            'hiragana': 'きゅう',
+            'kanji': '九'
+          }]
+        }
+      ];
+
+      let numberElems = [...[...Array(5).keys()].map(e => document.querySelector(`#number-${e}`))];
+
+      let setNumber = (index, value) => {
+        numberElems[index].innerText = value == undefined ? '_' : `${value}`;
+      };
+
+      let explanationElem = document.querySelector('#explanation');
+
+      const PrintModes = {
+        Romaji: 0,
+        Hiragana: 1,
+        Kanji: 2,
+        Both: 3,
+      };
+
+      let addExplanation = (index, value) => {
+        if (value == 0) {
+          return;
+        }
+        const pronunciationTuple = PRONUNCIATIONS[value].pronunciations[index];
+        const valueText = printMode == PrintModes.Romaji ? pronunciationTuple.romaji : (
+          printMode == PrintModes.Hiragana ? pronunciationTuple.hiragana : (
+            printMode == PrintModes.Kanji ? pronunciationTuple.kanji : `${pronunciationTuple.hiragana} (${pronunciationTuple.kanji})`));
+        explanationElem.innerHTML += `<span class="number-${index}">${valueText}</span><br/>`;
+      };
+
+      const Modes = {
+        SingleNumber: 0,
+        SingleNumberRandom: 1,
+        Random: 2,
+        RandomExplain: 3,
+      };
+
+      let modeSelectorElem = document.querySelector('#mode');
+      let textSelectorElem = document.querySelector('#text');
+      let maxSelectorElem = document.querySelector('#max');
+
+      let mode = Modes.SingleNumber;
+      let printMode = PrintModes.Both;
+      let position = 1;
+
+      let index = -1;
+
+      let setSettings = () => {
+        resetNumbers();
+        mode = parseInt(modeSelectorElem.value);
+        printMode = parseInt(textSelectorElem.value);
+        position = 4 - parseInt(maxSelectorElem.value);
+        index = -1;
+        advance();
+      };
+
+      modeSelectorElem.addEventListener('change', setSettings);
+      textSelectorElem.addEventListener('change', setSettings);
+      maxSelectorElem.addEventListener('change', setSettings);
+
+      let resetNumbers = () => {
+        explanationElem.innerHTML = '';
+        document.querySelectorAll('#number-prompt span').forEach(e => {
+          e.style.opacity = 1;
+        });
+        for (let i in [...Array(5).keys()]) {
+          setNumber(i);
+        }
+      }
+
+      let showNumber = 0;
+      let opacityTargets = [];
+
+      let advance = () => {
+        index++;
+        if (mode == Modes.SingleNumber) {
+          let numberIndex = Math.floor(index / 2) % 9 + 1;
+          let showIndex = index % 2;
+          if (showIndex == 0) {
+            resetNumbers();
+            setNumber(position, numberIndex);
+          } else {
+            addExplanation(position, numberIndex);
+          }
+        } else if (mode == Modes.SingleNumberRandom || mode == Modes.Random) {
+          let showIndex = index % 2;
+          if (showIndex == 0) {
+            resetNumbers();
+            if (mode == Modes.SingleNumberRandom) {
+              showNumber = `${Math.ceil(Math.random() * 9) * Math.pow(10, 4-position)}`;
+            } else {
+              showNumber = `${Math.ceil(Math.random() * (Math.pow(10, (4-position) + 1) - Math.pow(10, (4-position)))) + Math.pow(10, (4-position))}`;
+            }
+            for (let i = position; i < 5; i++) {
+              setNumber(i, parseInt(showNumber[i - position]));
+            }
+          } else {
+            for (let i = position; i < 5; i++) {
+              addExplanation(i, parseInt(showNumber[i - position]));
+            }
+          }
+        } else if (mode == Modes.RandomExplain) {
+          if (opacityTargets.length == 0) {
+            resetNumbers();
+            showNumber = `${Math.ceil(Math.random() * (Math.pow(10, (4-position) + 1) - Math.pow(10, (4-position)))) + Math.pow(10, (4-position))}`;
+            for (let i = position; i < 5; i++) {
+              setNumber(i, parseInt(showNumber[i - position]));
+            }
+            for (let i = position; i < 5; i++) {
+              addExplanation(i, parseInt(showNumber[i - position]));
+            }
+            opacityTargets = [...document.querySelectorAll('#explanation span')].map(e => e.className);
+            for (let target of opacityTargets) {
+              document.querySelectorAll(`.${target}`).forEach(e => {
+                e.style.opacity = 0.1;
+              });
+            }
+          }
+          let target = opacityTargets[0];
+          opacityTargets = opacityTargets.slice(1);
+          document.querySelectorAll(`.${target}`).forEach(e => {
+            e.style.opacity = 1;
+          });
+        }
+      };
+
+      document.querySelector('#show').addEventListener('click', advance);
+
+      setSettings();
+
+    </script>
+  </body>
+</html>
